@@ -79,20 +79,7 @@ CREATE TABLE pagos (
     id_reserva bigint NOT NULL REFERENCES reservas(id_reserva),
     id_ganancia bigint NOT NULL REFERENCES ganancias(id_ganancia),
     rut_usuario text NOT NULL REFERENCES usuarios(rut),
-    -- Campos específicos para Mercado Pago
-    mp_payment_id text UNIQUE,
-    mp_payment_status text,
-    mp_status_detail text,
-    mp_payment_method_id text,
-    mp_payment_type_id text,
-    mp_merchant_order_id text,
-    mp_external_reference text,
-    mp_transaction_amount decimal(10, 2),
-    mp_installments int,
-    mp_card_last_four_digits text,
-    mp_card_holder_name text,
-    mp_authorization_code text,
-    metadata jsonb -- Para almacenar datos adicionales del pago
+
 );
 
 -- La tabla auditoria contiene información sobre las acciones realizadas
@@ -129,7 +116,6 @@ CREATE INDEX idx_reservas_fecha ON reservas(fecha);
 CREATE INDEX idx_reservas_estado ON reservas(estado);
 CREATE INDEX idx_pagos_fecha ON pagos(fecha_pago);
 CREATE INDEX idx_pagos_estado ON pagos(estado);
-CREATE INDEX idx_pagos_mp_payment_id ON pagos(mp_payment_id);
 CREATE INDEX idx_reservas_codigo ON reservas(codigo_reserva);
 
 -- Comentarios en las tablas
@@ -137,5 +123,3 @@ COMMENT ON TABLE reservas IS 'Almacena las reservas de canchas incluyendo códig
 COMMENT ON TABLE pagos IS 'Almacena información detallada de pagos, incluyendo datos específicos de Mercado Pago';
 COMMENT ON COLUMN reservas.codigo_reserva IS 'Código único alfanumérico para identificar la reserva';
 COMMENT ON COLUMN reservas.codigo_qr IS 'Datos o URL del código QR generado para la reserva';
-COMMENT ON COLUMN pagos.mp_payment_id IS 'ID de pago generado por Mercado Pago';
-COMMENT ON COLUMN pagos.metadata IS 'Datos adicionales del pago en formato JSON';

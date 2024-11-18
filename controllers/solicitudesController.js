@@ -6,7 +6,12 @@ exports.obtenerSolicitudes = async (req, res) => {
     const solicitudes = await Solicitud.obtenerTodas()
     res.json(solicitudes)
   } catch (error) {
-    res.status(500).json({ error: 'Error al obtener solicitudes' })
+    console.error('Error detallado:', error)
+    res.status(500).json({ 
+      error: 'Error al obtener solicitudes',
+      mensaje: error.message,
+      detalles: error.details
+    })
   }
 }
 
@@ -24,10 +29,22 @@ exports.obtenerSolicitudPorId = async (req, res) => {
 
 exports.crearSolicitud = async (req, res) => {
   try {
+    // Validación de campos requeridos
+    const { motivo, tipo_solicitud, rut_usuario } = req.body
+    if (!motivo || !tipo_solicitud || !rut_usuario) {
+      return res.status(400).json({ 
+        error: 'Los campos motivo, tipo_solicitud y rut_usuario son obligatorios' 
+      })
+    }
+
     const nuevaSolicitud = await Solicitud.crearSolicitud(req.body)
     res.status(201).json(nuevaSolicitud)
   } catch (error) {
-    res.status(500).json({ error: 'Error al crear solicitud' })
+    console.error('Error al crear solicitud:', error)
+    res.status(500).json({ 
+      error: 'Error al crear solicitud',
+      detalle: error.message 
+    })
   }
 }
 

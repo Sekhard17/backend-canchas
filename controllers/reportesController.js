@@ -6,7 +6,12 @@ exports.obtenerReportes = async (req, res) => {
     const reportes = await Reporte.obtenerTodos()
     res.json(reportes)
   } catch (error) {
-    res.status(500).json({ error: 'Error al obtener reportes' })
+    console.error('Error detallado:', error)
+    res.status(500).json({ 
+      error: 'Error al obtener reportes',
+      mensaje: error.message,
+      detalles: error.details
+    })
   }
 }
 
@@ -24,10 +29,22 @@ exports.obtenerReportePorId = async (req, res) => {
 
 exports.crearReporte = async (req, res) => {
   try {
+    // Validación de campos requeridos
+    const { tipo_reporte, descripción, rut_usuario } = req.body
+    if (!tipo_reporte || !descripción || !rut_usuario) {
+      return res.status(400).json({ 
+        error: 'Los campos tipo_reporte, descripción y rut_usuario son obligatorios' 
+      })
+    }
+
     const nuevoReporte = await Reporte.crearReporte(req.body)
     res.status(201).json(nuevoReporte)
   } catch (error) {
-    res.status(500).json({ error: 'Error al crear reporte' })
+    console.error('Error al crear reporte:', error)
+    res.status(500).json({ 
+      error: 'Error al crear reporte',
+      detalle: error.message 
+    })
   }
 }
 
