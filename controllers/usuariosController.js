@@ -108,13 +108,34 @@ exports.loginUsuario = async (req, res) => {
 
 exports.actualizarUsuario = async (req, res) => {
   try {
-    const usuarioActualizado = await Usuario.actualizarUsuario(req.params.id, req.body)
+    const rut = req.params.id;
+    console.log('Actualizando usuario con RUT:', rut);
+    console.log('Datos recibidos:', req.body);
+
+    // Filtrar campos undefined o null
+    const datosActualizados = Object.fromEntries(
+      Object.entries(req.body).filter(([_, v]) => v != null && v !== '')
+    );
+
+    console.log('Datos filtrados para actualización:', datosActualizados);
+
+    const usuarioActualizado = await Usuario.actualizarUsuario(rut, datosActualizados);
+    
     if (!usuarioActualizado) {
-      return res.status(404).json({ error: 'El usuario que deseas actualizar no se ha encontrado.' })
+      return res.status(404).json({ 
+        error: 'Usuario no encontrado',
+        details: `No se encontró usuario con RUT: ${rut}`
+      });
     }
-    res.json(usuarioActualizado)
+
+    console.log('Usuario actualizado correctamente:', usuarioActualizado);
+    res.json(usuarioActualizado);
   } catch (error) {
-    res.status(500).json({ error: 'Hubo un problema al actualizar el usuario, por favor inténtelo más tarde.' })
+    console.error('Error completo en actualizarUsuario:', error);
+    res.status(500).json({ 
+      error: 'Error al actualizar usuario',
+      details: error.message 
+    });
   }
 }
 

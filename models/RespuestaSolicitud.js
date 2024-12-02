@@ -1,34 +1,57 @@
 // models/RespuestaSolicitud.js - Modelo de RespuestaSolicitud
+const supabase = require('../config/database')
+
 class RespuestaSolicitud {
-    static async obtenerTodas() {
-      const { data, error } = await supabase.from('Respuesta_solicitud').select('*')
-      if (error) throw error
-      return data
+    static async obtenerPorSolicitud(id_solicitud) {
+      try {
+        const { data, error } = await supabase
+          .from('respuesta_solicitud')
+          .select(`
+            id_respuesta,
+            fecha_respuesta,
+            respuesta,
+            estado,
+            id_solicitud
+          `)
+          .eq('id_solicitud', id_solicitud)
+          .single()
+
+        if (error) throw error
+        return data
+      } catch (error) {
+        console.error('Error en obtenerPorSolicitud:', error)
+        throw new Error('Error al obtener la respuesta')
+      }
     }
-  
-    static async obtenerPorId(id) {
-      const { data, error } = await supabase.from('Respuesta_solicitud').select('*').eq('ID_Respuesta', id).single()
-      if (error) throw error
-      return data
+
+    static async crearRespuesta(respuestaData) {
+      try {
+        const nuevaRespuesta = {
+          fecha_respuesta: new Date().toISOString(),
+          respuesta: respuestaData.respuesta,
+          estado: respuestaData.estado,
+          id_solicitud: respuestaData.id_solicitud
+        }
+
+        const { data, error } = await supabase
+          .from('respuesta_solicitud')
+          .insert([nuevaRespuesta])
+          .select()
+
+        if (error) throw error
+
+        // Actualizar el estado de la solicitud
+        await supabase
+          .from('solicitudes')
+          .update({ estado_solicitud: respuestaData.estado })
+          .eq('id_solicitud', respuestaData.id_solicitud)
+
+        return data[0]
+      } catch (error) {
+        console.error('Error en crearRespuesta:', error)
+        throw new Error('Error al crear la respuesta')
+      }
     }
-  
-    static async crearRespuesta(respuesta) {
-      const { data, error } = await supabase.from('Respuesta_solicitud').insert([respuesta]).select('*')
-      if (error) throw error
-      return data[0]
-    }
-  
-    static async actualizarRespuesta(id, data) {
-      const { data: updatedData, error } = await supabase.from('Respuesta_solicitud').update(data).eq('ID_Respuesta', id).select('*')
-      if (error) throw error
-      return updatedData[0]
-    }
-  
-    static async eliminarRespuesta(id) {
-      const { data, error } = await supabase.from('Respuesta_solicitud').delete().eq('ID_Respuesta', id).select('*')
-      if (error) throw error
-      return data[0]
-    }
-  }
-  
-  module.exports = RespuestaSolicitud
+}
+
+module.exports = RespuestaSolicitud

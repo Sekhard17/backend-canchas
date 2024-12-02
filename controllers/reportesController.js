@@ -71,3 +71,17 @@ exports.eliminarReporte = async (req, res) => {
     res.status(500).json({ error: 'Error al eliminar reporte' })
   }
 }
+
+exports.obtenerEstadisticas = async (req, res) => {
+  try {
+    const estadisticas = await Reporte.obtenerEstadisticas();
+    res.json(estadisticas);
+  } catch (error) {
+    console.error('Error al obtener estadísticas:', error);
+    res.status(500).json({ 
+      error: 'Error al obtener estadísticas',
+      mensaje: error.message,
+      detalles: error.details
+    });
+  }
+};

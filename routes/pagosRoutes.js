@@ -12,5 +12,6 @@ router.get('/:id', pagosController.obtenerPagoPorId)
 router.post('/', pagosController.crearPago)
 router.put('/:id', pagosController.actualizarPago)
 router.delete('/:id', pagosController.eliminarPago)
+router.get('/total-gastado', pagosController.obtenerTotalGastadoPorUsuario)
 
 module.exports = router

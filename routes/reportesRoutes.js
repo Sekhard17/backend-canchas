@@ -8,5 +8,6 @@ router.get('/:id', reportesController.obtenerReportePorId)
 router.post('/', reportesController.crearReporte)
 router.put('/:id', reportesController.actualizarReporte)
 router.delete('/:id', reportesController.eliminarReporte)
+router.get('/estadisticas/dashboard', reportesController.obtenerEstadisticas)
 
 module.exports = router

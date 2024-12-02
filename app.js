@@ -8,7 +8,7 @@ require('dotenv').config();
 const express = require('express');
 const app = express();
 const cors = require('cors');
-const morgan = require('morgan'); // Faltaba importar morgan
+const morgan = require('morgan'); 
 
 // Importación de rutas
 const routes = {

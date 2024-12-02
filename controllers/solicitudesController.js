@@ -4,13 +4,14 @@ const Solicitud = require('../models/Solicitud')
 exports.obtenerSolicitudes = async (req, res) => {
   try {
     const solicitudes = await Solicitud.obtenerTodas()
-    res.json(solicitudes)
+    res.json({
+      success: true,
+      data: solicitudes
+    })
   } catch (error) {
-    console.error('Error detallado:', error)
-    res.status(500).json({ 
-      error: 'Error al obtener solicitudes',
-      mensaje: error.message,
-      detalles: error.details
+    res.status(500).json({
+      success: false,
+      error: error.message
     })
   }
 }
@@ -29,21 +30,24 @@ exports.obtenerSolicitudPorId = async (req, res) => {
 
 exports.crearSolicitud = async (req, res) => {
   try {
-    // Validación de campos requeridos
-    const { motivo, tipo_solicitud, rut_usuario } = req.body
+    const { motivo, tipo_solicitud, nueva_hora_inicio, nueva_hora_fin, rut_usuario } = req.body
+
     if (!motivo || !tipo_solicitud || !rut_usuario) {
-      return res.status(400).json({ 
-        error: 'Los campos motivo, tipo_solicitud y rut_usuario son obligatorios' 
+      return res.status(400).json({
+        success: false,
+        error: 'Faltan campos requeridos'
       })
     }
 
-    const nuevaSolicitud = await Solicitud.crearSolicitud(req.body)
-    res.status(201).json(nuevaSolicitud)
+    const solicitud = await Solicitud.crearSolicitud(req.body)
+    res.status(201).json({
+      success: true,
+      data: solicitud
+    })
   } catch (error) {
-    console.error('Error al crear solicitud:', error)
-    res.status(500).json({ 
-      error: 'Error al crear solicitud',
-      detalle: error.message 
+    res.status(500).json({
+      success: false,
+      error: error.message
     })
   }
 }

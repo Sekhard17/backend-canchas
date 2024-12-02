@@ -3,13 +3,25 @@ const Reserva = require('../models/Reserva')
 
 exports.obtenerReservas = async (req, res) => {
   try {
-    const reservas = await Reserva.obtenerTodas()
-    res.json(reservas)
+    const { date } = req.query;
+    console.log('Fecha recibida:', date);
+
+    let reservas;
+    if (date) {
+      reservas = await Reserva.obtenerPorFecha(date);
+    } else {
+      reservas = await Reserva.obtenerTodas();
+    }
+    
+    res.json(reservas || []);
   } catch (error) {
-    console.error('Error al obtener reservas:', error)  // Esto imprimirá el error completo en los logs
-    res.status(500).json({ error: 'Error al obtener reservas', details: error.message })
+    console.error('Error al obtener reservas:', error);
+    res.status(500).json({ 
+      error: 'Error al obtener reservas', 
+      details: error.message 
+    });
   }
-}
+};
 
 
 exports.obtenerReservaPorId = async (req, res) => {
@@ -59,18 +71,29 @@ exports.eliminarReserva = async (req, res) => {
 
 exports.obtenerReservasUsuario = async (req, res) => {
   try {
-    console.log('Contenido de req.user:', req.user);  // Imprimir req.user para ver qué contiene
-
-    const rutUsuario = req.user.id;  // O verifica si es req.user.rut o req.user.RUT
-    if (!rutUsuario) {
-      return res.status(400).json({ error: 'No se encontró el RUT del usuario en el token' });
+    console.log('Usuario solicitando reservas:', req.user);
+    
+    const reservas = await Reserva.obtenerPorUsuario(req.user.id);
+    
+    console.log('Reservas sin procesar:', reservas);
+    
+    if (reservas && reservas.length > 0) {
+      const ejemploReserva = reservas[0];
+      console.log('Ejemplo de horarios:', {
+        id: ejemploReserva.id_reserva,
+        fecha: ejemploReserva.fecha,
+        hora_inicio: ejemploReserva.hora_inicio,
+        hora_fin: ejemploReserva.hora_fin
+      });
     }
-
-    const reservas = await Reserva.obtenerPorUsuario(rutUsuario);
+    
     res.json(reservas);
   } catch (error) {
     console.error('Error al obtener reservas del usuario:', error);
-    res.status(500).json({ error: 'Error al obtener reservas del usuario', details: error.message });
+    res.status(500).json({ 
+      error: 'Error al obtener reservas del usuario',
+      details: error.message 
+    });
   }
 };
 

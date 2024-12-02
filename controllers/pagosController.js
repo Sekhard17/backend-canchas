@@ -103,3 +103,22 @@ exports.obtenerEstadisticas = async (req, res) => {
     res.status(500).json({ error: 'Error al obtener estadísticas' });
   }
 };
+
+exports.obtenerTotalGastadoPorUsuario = async (req, res) => {
+  try {
+    if (!req.user || !req.user.id) {
+      return res.status(400).json({ error: 'Usuario no encontrado' });
+    }
+
+    const rutUsuario = req.user.id;
+    const totalGastado = await Pago.obtenerTotalGastadoPorUsuario(rutUsuario);
+    
+    res.json({ totalGastado });
+  } catch (error) {
+    console.error('Error al obtener total gastado:', error);
+    res.status(500).json({ 
+      error: 'Error al calcular el total gastado',
+      details: error.message 
+    });
+  }
+};
